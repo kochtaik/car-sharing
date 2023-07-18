@@ -86,9 +86,30 @@ async function updateOldCars(req, res) {
         res.status(500).json({ success: false });
     }
 }
+/**
+ * update any car that has been booked more than 2 times
+ * and aren't *In use* or *Reserved* by setting location coordinates
+ * to { latitude: 53.8882836, longitude: 27.5442615}
+ */
+async function updateFrequentlyBookedCars(req, res) {
+    try {
+        const response = await Car.updateMany(
+            {
+                $or: [
+                    { 'bookings_history.2': { $exists: true } },
+                    { status: { $nin: ['in-use', 'reserved'] } },
+                ]
+            },
+            {
+                $set: { 'location.coordinates': [53.8882836, 27.5442615] },
+            },
+        );
 
-function updateFrequentlyBookedCars(req, res) {
-
+        return res.status(200).json({ success: true, nbHits: response.modifiedCount });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false });
+    }
 }
 
 function removeCar(req, res) {

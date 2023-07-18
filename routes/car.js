@@ -13,7 +13,7 @@ router.get('/in-use', getCarsInUse);
 router.get('/reserved', getReservedCars);
 router.post('/add', addCar);
 router.put('/update-old-cars', updateOldCars);
-router.put('/update-frequently-booked/:vin', updateFrequentlyBookedCars);
+router.put('/update-frequently-booked', updateFrequentlyBookedCars);
 router.delete('/remove/:vin', removeCar);
 
 
