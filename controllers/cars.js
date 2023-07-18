@@ -112,8 +112,19 @@ async function updateFrequentlyBookedCars(req, res) {
     }
 }
 
-function removeCar(req, res) {
+/**
+ * Remove car by VIN
+ */
+async function removeCar(req, res) {
+    try {
+        const { vin } = req.params;
+        await Car.deleteOne({ vin });
 
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false });
+    }
 }
 
 module.exports = {
