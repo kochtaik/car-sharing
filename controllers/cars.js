@@ -57,10 +57,23 @@ async function getReservedCars(req, res) {
 
 function addCar(req, res) {
 
-}
-
-function updateOldCars(req, res) {
-
+/**
+ * Update any car produced before '01/01/2017' or
+ * has mileage greater than 100000 km by setting Status to *In Service*
+ */
+async function updateOldCars(req, res) {
+    try {
+        const response = await Car.updateMany({
+            $or: [
+                { 'production_info.date': { $lt: new Date(2017, 0, 1) } },
+                { 'mileage.value': { $gt: 100000 } },
+            ],
+        }, { $set: { status: 'in-service' } });
+        res.status(200).json({ success: true, nbHits: response.modifiedCount });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ success: false });
+    }
 }
 
 function updateFrequentlyBookedCars(req, res) {
