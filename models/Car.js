@@ -17,7 +17,11 @@ const CarSchema = new mongoose.Schema({
         model: String,
         date: Date,
     },
-    status: ["free", "reserved", "in-use", "unavailable", "in-service"],
+    status: {
+        type: String,
+        enum: ["free", "reserved", "in-use", "unavailable", "in-service"],
+        required: true,
+    },
     fuel_level: getMeasurementSchema(["liter", "percent"]),
     mileage: getMeasurementSchema(["km"]),
     current_run: getMeasurementSchema(["km"]),
@@ -26,7 +30,6 @@ const CarSchema = new mongoose.Schema({
         required: true,
     },
     driver: {
-        required: true,
         license_number: {
             type: String,
             required: true,
@@ -34,13 +37,14 @@ const CarSchema = new mongoose.Schema({
         first_name: {
             type: String,
             required: true,
+            trim: true,
         },
         last_name: {
             type: String,
             required: true,
+            trim: true,
         },
         credit_card: {
-            required: true,
             number: {
                 type: Number,
                 required: true,
@@ -48,6 +52,7 @@ const CarSchema = new mongoose.Schema({
             owner: {
                 type: String,
                 required: true,
+                trim: true,
                 validate: {
                     validator: function (value) {
                         const regex = /^[a-zA-Z-]+ [a-zA-Z-]+$/;
@@ -61,14 +66,14 @@ const CarSchema = new mongoose.Schema({
                 required: true,
             }
         },
-        start_fuel_level: getMeasurementSchema(["liters"]),
-        start_milage: getMeasurementSchema(["km"]),
-        location: LocationSchema,
-        bookings_history: {
-            type: [BookingHistoryRecord],
-            required: true,
-        }
+    },
+    start_fuel_level: getMeasurementSchema(["liters"]),
+    start_milage: getMeasurementSchema(["km"]),
+    location: LocationSchema,
+    bookings_history: {
+        type: [BookingHistoryRecord],
+        required: true,
     }
 });
 
-module.exports = mongoose.Model('Car', CarSchema);
+module.exports = mongoose.model('Car', CarSchema);

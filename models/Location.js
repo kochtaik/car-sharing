@@ -1,16 +1,14 @@
 const mongoose = require('mongoose');
 
 const LocationSchema = new mongoose.Schema({
-    location: {
-        type: {
-            type: String,
-            enum: ['Point'],
-            required: true
-        },
-        coordinates: {
-            type: [Number],
-            required: true
-        }
+    type: {
+        type: String,
+        enum: ['Point'],
+        required: true
+    },
+    coordinates: {
+        type: [Number],
+        required: true
     }
 });
 
