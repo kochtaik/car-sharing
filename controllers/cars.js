@@ -55,7 +55,18 @@ async function getReservedCars(req, res) {
     }
 }
 
-function addCar(req, res) {
+/**
+ * Add new car in the car sharing park.
+ */
+async function addCar(req, res) {
+    try {
+        await Car.create(req.body);
+        res.status(200).json({ success: true });
+    } catch(error) {
+        console.log(error);
+        res.status(500).json({ success: false });
+    } 
+}
 
 /**
  * Update any car produced before '01/01/2017' or
