@@ -25,8 +25,34 @@ async function getCarsInUse(req, res) {
     
 }
 
-function getReservedCars(req, res) {
+/**
+ * Obtain all cars that have been reserved,
+ * but driver credit/debit card hasn't been authorized.
+ */
+async function getReservedCars(req, res) {
+    try {
+        const curDate = new Date();
+        const cars = await Car.find({
+            status: 'reserved',
+            'driver.credit_card.valid_through': {
+                $lt: curDate,
+            },
+        }, {
+            vin: true,
+            location: true,
+            driver: {
+                first_name: true,
+                last_name: true,
+                license_number: true,
+            },
+        });
 
+        return res.status(200).json({ success: true, nbHits: cars.length, cars })
+
+    } catch(error) {
+        console.error(error);
+        res.status(500).json({ success: false }); 
+    }
 }
 
 function addCar(req, res) {
