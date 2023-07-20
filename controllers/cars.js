@@ -1,5 +1,5 @@
 const Car = require('../models/Car');
-
+const { successUpdateResponse, successReadResponse, baseSuccessResponse } = require('../utils/response-factory');
 
 /**
  * Obtain list of cars that are currently in use
@@ -7,17 +7,12 @@ const Car = require('../models/Car');
  */
 async function getCarsInUse(req, res) {
     try {
-        const car = await Car.find({
+        const cars = await Car.find({
             status: 'in-use',
             'fuel_level.value': { $lte: 25 },
         });
 
-        return res.status(200).json({
-            success: true,
-            data: car,
-            nbHits: car.length,
-        });
-
+        return res.status(200).json(successReadResponse(cars));
     } catch(error) {
         console.error(error);
         res.status(500).json({ success: false });
@@ -47,7 +42,7 @@ async function getReservedCars(req, res) {
             },
         });
 
-        return res.status(200).json({ success: true, nbHits: cars.length, cars })
+        return res.status(200).json(successReadResponse(cars));
 
     } catch(error) {
         console.error(error);
@@ -61,7 +56,7 @@ async function getReservedCars(req, res) {
 async function addCar(req, res) {
     try {
         await Car.create(req.body);
-        res.status(200).json({ success: true });
+        return res.status(200).json(baseSuccessResponse);
     } catch(error) {
         console.log(error);
         res.status(500).json({ success: false });
@@ -80,14 +75,15 @@ async function updateOldCars(req, res) {
                 { 'mileage.value': { $gt: 100000 } },
             ],
         }, { $set: { status: 'in-service' } });
-        res.status(200).json({ success: true, nbHits: response.modifiedCount });
+
+        return res.status(200).json(successUpdateResponse(response.modifiedCount));
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false });
     }
 }
 /**
- * update any car that has been booked more than 2 times
+ * Update any car that has been booked more than 2 times
  * and aren't *In use* or *Reserved* by setting location coordinates
  * to { latitude: 53.8882836, longitude: 27.5442615}
  */
@@ -105,7 +101,7 @@ async function updateFrequentlyBookedCars(req, res) {
             },
         );
 
-        return res.status(200).json({ success: true, nbHits: response.modifiedCount });
+        return res.status(200).json(successUpdateResponse(response.modifiedCount));
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false });
@@ -120,7 +116,7 @@ async function removeCar(req, res) {
         const { vin } = req.params;
         await Car.deleteOne({ vin });
 
-        return res.status(200).json({ success: true });
+        return res.status(200).json(baseSuccessResponse);
     } catch (error) {
         console.log(error);
         res.status(500).json({ success: false });
