@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 const LocationSchema = require('./Location');
 const BookingHistoryRecord = require('./BookingHistoryRecord');
 const getMeasurementSchema = require('./Measurement');
+const { CAR_STATUSES } = require('../constants/car');
 
 const CarSchema = new mongoose.Schema({
     vin: {
@@ -19,7 +20,7 @@ const CarSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ["free", "reserved", "in-use", "unavailable", "in-service"],
+        enum: Object.values(CAR_STATUSES),
         required: true,
     },
     fuel_level: getMeasurementSchema(["liter", "percent"]),

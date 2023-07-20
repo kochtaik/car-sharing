@@ -1,5 +1,6 @@
 const Car = require('../models/Car');
 const { successUpdateResponse, successReadResponse, baseSuccessResponse } = require('../utils/response-factory');
+const { CAR_STATUSES } = require('../constants/car');
 
 /**
  * Obtain list of cars that are currently in use
@@ -8,7 +9,7 @@ const { successUpdateResponse, successReadResponse, baseSuccessResponse } = requ
 async function getCarsInUse(req, res) {
     try {
         const cars = await Car.find({
-            status: 'in-use',
+            status: CAR_STATUSES.IN_USE,
             'fuel_level.value': { $lte: 25 },
         });
 
@@ -28,7 +29,7 @@ async function getReservedCars(req, res) {
     try {
         const curDate = new Date();
         const cars = await Car.find({
-            status: 'reserved',
+            status: CAR_STATUSES.RESERVED,
             'driver.credit_card.valid_through': {
                 $lt: curDate,
             },
@@ -74,7 +75,7 @@ async function updateOldCars(req, res) {
                 { 'production_info.date': { $lt: new Date(2017, 0, 1) } },
                 { 'mileage.value': { $gt: 100000 } },
             ],
-        }, { $set: { status: 'in-service' } });
+        }, { $set: { status: CAR_STATUSES.IN_SERVICE } });
 
         return res.status(200).json(successUpdateResponse(response.modifiedCount));
     } catch (error) {
@@ -93,7 +94,7 @@ async function updateFrequentlyBookedCars(req, res) {
             {
                 $or: [
                     { 'bookings_history.2': { $exists: true } },
-                    { status: { $nin: ['in-use', 'reserved'] } },
+                    { status: { $nin: [CAR_STATUSES.IN_USE, CAR_STATUSES.IN_SERVICE] } },
                 ]
             },
             {
