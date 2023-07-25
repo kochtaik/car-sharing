@@ -1,7 +1,7 @@
 const Car = require('../models/Car');
 const { CAR_STATUSES } = require('../constants/car');
 
-const { successUpdateResponse, successReadResponse, baseSuccessResponse } = require('../utils/response-factory');
+const { successUpdateResponse, successReadResponse, baseSuccessResponse, CustomAPIError } = require('../utils/response-factory');
 const tryCatchWrapper = require('../middleware/try-catch-wrapper');
 
 /**
@@ -89,9 +89,13 @@ const updateFrequentlyBookedCars = tryCatchWrapper(async (req, res) => {
 /**
  * Remove car by VIN
  */
-const removeCar = tryCatchWrapper(async (req, res) => {
+const removeCar = tryCatchWrapper(async (req, res, next) => {
     const { vin } = req.params;
-    await Car.deleteOne({ vin });
+    const response = await Car.deleteOne({ vin });
+
+    if (!response.deletedCount) {
+        return next(new CustomAPIError('Car not found', 404));
+    }
 
     return res.status(200).json(baseSuccessResponse);
 });
