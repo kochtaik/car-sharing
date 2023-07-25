@@ -9,8 +9,12 @@ function successUpdateResponse(nbHits) {
   return { ...baseSuccessResponse, nbHits };
 }
 
-function errorResponse(message) {
-  return { ...baseErrorResponse, message };
+function errorResponse(message, statusCode) {
+  return { ...baseErrorResponse, message, statusCode };
+}
+
+function isCustomErrorResponse(err) {
+  return !!err.statusCode && !!err.message;
 }
 
 module.exports = {
@@ -18,4 +22,5 @@ module.exports = {
   successReadResponse,
   successUpdateResponse,
   errorResponse,
+  isCustomErrorResponse,
 }
